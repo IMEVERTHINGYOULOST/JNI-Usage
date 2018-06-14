@@ -1,0 +1,15 @@
+1.http和https之间的区别
+http下加入ssl层，加密传输数据
+ssl层+ca证书公钥
+
+2.session和cookie之间的区别
+session因session-id，id存储在cookie中
+session在服务端，cookie在客户端
+
+3.Unicode和 Ansi码
+Unicode:16bit
+Ansi:8bit 256 来表示26个字符足够，但是汉字等几万个就无法表示
+
+4.修改为可以联网
+修改/etc/sysconfig/network-scripts/ifconfig-eth0
+将BOOTPROTO设置为dhcp，然后service network restart就行
