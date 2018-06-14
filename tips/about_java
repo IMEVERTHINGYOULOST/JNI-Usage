@@ -1,0 +1,45 @@
+1.maven是什么
+合理叙述项目间的依赖关系，通俗点讲，就是通过pom.xml文件的配置获取jar包，而不用手动去添加jar包
+
+2.C++调用maven这些有依赖包的JAVA maven
+maven生成jar包，格式一般为 0.0.1-SNAPSHOT-jar-with-dependencies，带有dependencies
+
+3.jdk的版本不一致会导致无法获取class吗
+会，linux和eclipise下的jdk版本需要一致
+
+4.jar file和runnable jar file的区别：
+仅仅是把.class打包了。所以执行这种jar file需要用 java -cp .;ch04.jar com.thnkjava.ch04, 如果你还应用到另外的lib库，
+你必须在cp里说明，也就是  java -cp .;ch04.jar;lib01.jar;lib02.jar com.thnkjava.ch04 来执行，事实上可以发现ch04.jar
+也在cp里面，说明ch04.jar就是lib库，最后的参数指明了要被执行的类名；
+如果从eclipse里export出的是 runnable jar file，那么个执行这个jar包的时候是不需要指明哪个类的，直接这样执行 java -jar ch04.jar
+
+5.eclipse的export三种打包方式
+extract    :  依赖的jar包变成class文件
+package :  依赖的jar包放在根目录下
+copy      ：依赖的jar包放在单独文件中
+
+
+
+3.前端问题
+http和https之间的区别
+http下加入ssl层，加密传输数据
+ssl层+ca证书公钥
+session和cookie之间的区别
+session因session-id，id存储在cookie中
+session在服务端，cookie在客户端
+
+4.Unicode和 Ansi码
+Unicode:16bit
+Ansi:8bit 256 来表示26个字符足够，但是汉字等几万个就无法表示
+
+5.cmake 跨平台安装的编译工具
+cmake,qmake
+makefile用make来执行
+qmake生成makefile
+cmake根据不同的环境生成vs文件，makefile文件，cmakelist.txt文件
+
+
+
+2.
+修改/etc/sysconfig/network-scripts/ifconfig-eth0
+将BOOTPROTO设置为dhcp，然后service network restart就行
