@@ -1,0 +1,169 @@
+1.ali hitsdb参数的意义，metric的几个参数是什么含义？
+1）metric：是一个监控项，服务器的话，有CPU使用率，内存使用率这种，类比于metrictages
+2）tags:键值对，Tags由tagk和tagv组成，即tagk=takv。标签是用来描述Metric的，譬如上面为了标记是服务器A的CpuUsage，tags可为hostname=qatest
+3）Value：一个Value表示一个metric的实际数值，譬如上面的99%
+4）Timestamp：即时间戳，用来描述Value是什么时候的；譬如上面的21:00
+5）Data Point：即某个Metric在某个时间点的数值
+                        Data Point包括以下部分：Metric、Tags、Value、Timestamp
+                       上面描述的服务器在21:00时候的cpu使用率，就是1个DataPoint
+保存到OpenTSDB的，就是无数个DataPoint
+
+2.数据库的份额里
+1.K/V型数据库，NoSQL数据库
+主要存储结构为 key-value,value有的为JSON格式
+
+2.JSON格式和XML格式
+从带宽选择以及解析效率来分析，JSON传输变化不大，但是解析效率很快
+XML
+<person>
+<name>xiaoMing</name>
+<age>20</age>
+</person>
+JSON
+{
+"name":"xiaoMing",
+"age":20
+}
+
+3.时间序列数据库的分布式存储
+唯一列簇
+
+4.写入磁盘操作？写入到指定或者自定义文件中
+传统数据库存储采用的是B_Tree，但是磁盘寻道很慢，即使将硬盘换成SDD，仍然无法解决问题
+所以一些HBase用LMS Tree换成B Tree
+
+5.mongodb的一些基本概念
+
+
+
+继续昨天的任务
+1.实现C++调用JAVA
+3.了解百度云时间序列数据库
+4.用伪代码解释阿里云和百度云的example例子
+7.开启阿里云实例模式
+8.实现阿里云java例子
+9.socket模拟http socket包
+
+
+4.阿里云java例子
+1.配置HiTSDBConfig ,ip+端口号
+2.HiTSDB连接 通过HiTSBFactory连接
+3.写入数据，格式为（metric+tags+value+timestamp）
+tsdb.put()
+4.关闭
+
+
+查询
+1.tdsb.query查询 list<QueryResult>保存查询结果
+阿里云Http例子
+1.closeableHttpClient
+2.HttpPost
+3.data放入StringEntity中
+4.httppost设置data
+5.httpclient执行Post
+
+8.实现阿里云java例子
+maven实现
+
+
+
+
+OTHERS
+1.http包
+http用tcp连接，默认端口80
+1 HTTP请求包
+　　HTTP请求包(GET、POST等请求方法)由三个部分构成，分别是：方法-URI-协议/版本，请求头，请求正文。下面是一个HTTP请求包(GET)的例子：
+GET /index.jsp HTTP/1.1
+Accept-Language: zh-cn
+Connection: Keep-Alive
+Host: 192.168.0.106
+Content-Length: 37
+userName=new_andy&password=new_andy
+    请求包的第一行是方法-URI-协议/版本：
+    GET就是请求方法，根据HTTP标准，HTTP请求可以使用多种请求方法。HTTP 1.1支持七种请求方法：GET、POST、HEAD、OPTIONS、PUT、DELETE和TRACE等，常用的为请求方法是GET和POST
+    /index.jsp表示URI。URI指定了要访问的网络资源
+    最后一行userName=new_andy&password=new_andy为正文，正文与HTTP头部有一个空行(\r\n)分隔。这里需要说明的一点，其中Content-Length说明正文的长度，有的正文长度没有在头部说明，只是标明Transfer-Encoding: chunked。关于chunked类型的长度计算方法，见RFC 1626
+　　2 HTTP应答包
+　　和HTTP请求包相似，由三个部分构成，分别是：协议-状态代码-描述，应答头，应答正文。下面是一个HTTP应答的例子：
+HTTP/1.1 200 OK
+Server: Microsoft-IIS/4.0
+Date: Mon, 3 Jan 2005 13:13:33 GMT
+Content-Type: text/html
+Last-Modified: Mon, 11 Jan 2004 13:23:42 GMT
+Content-Length: 90
+<html>
+<head>
+<title>解读HTTP包示例</title></head><body>
+Hello WORLD!
+</body>
+</html>
+　　HTTP应答包的第一行类似于HTTP请求的第一行，表示所用的协议是HTTP 1.1，服务器处理请求的状态码200
+　　应答头也和请求头一样包含许多有用的信息，例如服务器类型、日期时间、内容类型和长度等。应答的正文就是服务器返回的HTML页面。应答头和正文之间也用CRLF分隔
+
+2.http RESTful Web Services
+
+
+继续昨天的任务
+1.实现C++调用JAVA
+3.了解百度云时间序列数据库
+4.用伪代码解释百度云的example例子
+7.开启阿里云实例模式
+9.socket模拟http socket包
+
+1.C++调用JAVA
+编译后make不过，
+----没找到相关库，在LIBPATH和LIBS里面添加路径和库名
+----很多JAVA，在JAVA_HOME里面
+----JAVA_HOME
+----LIBS里面的添加格式为ljvm也就是libjvm.so
+make过了，但是程序跑得时候说是缺少相关库
+----进入可执行的文件，ldd hitest
+----libjvm.so没有找到相关连接，编译通过运行时无法连接do
+----将lidjvm.so考到/usr/lib64目录下，此时运行可以成功
+
+----缺少好几个库，在create_javavm时候报错
+
+3.有http和https俩种
+aliyun的主要是hitsdbfactory连接hitsdbconfig，查询需要固定json格式// httpclient连接url
+不需要用户名密码，只要域名和接口就OK了
+baiduyun的主要是分为http和https，连接的时候需要用户ID和key 域名
+俩者的写入操作都基本一直，固定的metric格式，查询也一致
+
+
+
+1.实现C++调用JAVA
+7.开启阿里云实例模式
+9.socket模拟http socket包
+10.scada2gis修改测试
+
+1.Error occurred during initialization of VM
+java/lang/NoClassDefFoundError: java/lang/Object
+
+NoClassDefFoundError的错误是因为在运行时类加载器在classpath下找不到需要加载的类，所以我们需要把对应的类加载到classpath中
+----没有加载class?缺少实例
+
+javap -classpath ./
+----查看Java签名是
+
+ldd hitest
+----JIN_CreateJavaJVM()返回值为-1
+----libjvm.so连接不对ldd后发现连接的是/usr/lib/libjvm.so下的而不是$JAVA_HOME/jre/lib/amd64/server下的libjvm.so
+----pro文件里面添加了还是没发现
+----LD_LIBRARY_PATH里面setenv
+在.cshrc里面添加
+setenv LD_LIBRARY_PATH $JAVA_HOME/jre/lib/amd64/server:$LD_LIBRARY_PATH
+setenv LD_LIBRARY_PATH $JAVA_HOME/jre/lib/amd64:$LD_LIBRARY_PATH
+---尝试SUN JDK
+
+
+
+1.实现C++调用JAVA
+7.开启阿里云实例模式
+9.socket模拟http socket包
+10.scada2gis修改测试
+
+7.开启阿里云实例模式
+账号密码:hexingcy/123456@abcd
+root密码:123456@abcd，已修改为123456
+远程连接密码348599
+专有网络：hxnetwork 192.168.0.0/16
