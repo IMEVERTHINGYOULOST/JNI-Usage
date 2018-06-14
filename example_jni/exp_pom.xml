@@ -1,0 +1,62 @@
+#example for pom.xml
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>co.hxgroup</groupId>//groupid
+	<artifactId>hitsdbclient</artifactId>//artifactid
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+这是将java项目引用的jar包统一打包成一个jar包，（命名类似于
+hitsdbclient-0.0.1-SNAPSHOT-jar-with-dependencies.jar）
+注意：如果有main函数，该jar包即是一个可以直接运行的jar包，centos下运行命令为
+java -jar hitsdbclient-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+如果报错，需检查centos的java版本，pom.xml文件查看有没有打包错
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<!--修复 打包 没有主清单属性的时候 -->
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>co.hxgroup.hitsdbclient.App</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-my-jar-with-dependencies</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>hitsdb-client</artifactId>
+			<version>0.0.5</version>
+		</dependency>
+
+	</dependencies>
+</project>
