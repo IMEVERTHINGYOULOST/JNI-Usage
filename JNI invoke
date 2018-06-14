@@ -1,0 +1,117 @@
+前提：
+1.和安卓无关，只是普通的C++调用java
+2.运用QTpro方法makefile
+
+NI调用
+JNI:java和其他语言之间的交互，主要是和c，c++之间的互动，C++调用java
+一．java版本
+1.java在linux下的路径为
+echo $JAVA_HOME
+/usr/java/jdk1.8.0_144
+jdk版本为1.8.0_144
+
+2.windows本地eclipise的java版本
+路径:C:\Program Files\Java\jdk1.8.0_161
+注意：linux下的java版本应该大于windows下的java版本，如果版本不一致，会报错，方法是自行下载jdk版本，在.cshrc中添加相关路径
+
+3.pro文件添加JAVA_HOME路径
+INCLUDEPATH += \
+  $$(JAVA_HOME) \
+	$$(JAVA_HOME)/include/ \
+	$$(JAVA_HOME)/include/linux/ \
+	$$(JAVA_HOME)/jre/lib/amd64/ \
+	$$(JAVA_HOME)/jre/lib/amd64/server/ \
+LIBPATH += \
+  $$(JAVA_HOME)/jre/lib/amd64/ \
+  $$(JAVA_HOME)/jre/lib/amd64/server/ \
+
+4.在使用时候需要准备的文件
+1.java代码文件，*.java
+2.打包后的jar包， *.jar
+3.C++文件，*.h,*.cpp,*.pro
+
+
+二．java的pom.xml书写
+1.java用maven来构建项目，eclipise下的操作为
+File->new->other->Maven->Maven Project,点击默认就行，最后的Group Id和Arifact Id；
+GroupID是项目组织唯一的标识符，比如我的项目叫hxgroup那么GroupID应该是co.hxgroup (域名.项目名)
+ArtifactID就是项目的唯一的标识符,一般是具体的项目名,比如hitsdbclient 
+
+2.pom.xml示例（见另一个文档）
+使用maven clean.maven install来进行项目打包
+pom.xml->run as->maven clean
+pom.xml->run as->maven install
+
+三．C++JVM设置
+1.JVM参数设置以及意义
+JavaVMOption options[2];//虚拟机启动选项
+    JavaVM *jvm;//虚拟机指针
+    JavaVMInitArgs vm_args;//JavaVMInitArgs的VM初始化structure,包含JavaVMOptions
+    JNIEnv *env;//环境指针
+  options[0].optionString = "-Djava.compiler=NONE";//禁止JIT编译器的加载，节省时间，因为这里不需要重复执行java代码，禁用JIT更有效率
+options[1].optionString= "-Djava.class.path=hitsdbclient-0.0.1-SNAPSHOT-jar-with-dependencies.jar";//jar包位置，如果不指定的话就在当前目录寻找
+    vm_args.version = JNI_VERSION_1_6;//版本信息
+    vm_args.nOptions = 2;
+    vm_args.options = options;//JavaVMOptions的参数
+vm_args.ignoreUnrecognized = JNI_FALSE;
+int res = JNI_CreateJavaVM( &jvm, (void**)&env, &vm_args );//启动虚拟机
+
+2.找出jar包中的mainclass
+    jclass clazz;//java类对象
+    jobject obj;//分配新 Java 对象而不调用该对象的任何构造函数。返回该对象的引用
+
+clazz = env->FindClass("co/hxgroup/hitsdbclient/App");//FindClass为pom.xml中的
+mainclass,用/代替.
+obj = env->AllocObject(clazz);//
+
+3.找出java中具体方法，方法分为静态和非静态
+    jmethodID queryFun = env->GetMethodID(clazz, "queryfunc", "(J)V");
+jmethodID staticFun = env->GetStaticMethodID(clazz, "main", "([Ljava/lang/String;)V");
+env->CallObjectMethod(obj, queryFun,oid);
+注意连接到java的参数
+(J)V为void,参数为长整型
+([J)V为void,参数为长整型数组
+([Ljava/lang/String;)V也就是void(string)
+其他对应类型为
+
+
+
+4.销毁JavaAVM
+jvm->DestroyJavaVM();
+
+
+四．如何向java中传递数组
+C++里面的数组必须转换为java中的数组类型才可以传递，比如下面的长整型数组，需要转换为jlongArray才可以被传递，不然会出错
+ long arroid[5];
+ arroid[0]=5066549582823426;
+ arroid[1]=5066549582823499;
+    for (int i = 2;i< 5;i++) {
+        arroid[i] = 33333333333333;
+    }
+ jlongArray jArray;//传递的数组类型jlongArray
+ jArray = env->NewLongArray(5);
+ env->SetLongArrayRegion(jArray, 0, 5, (jlong*)arroid);
+ env->CallObjectMethod(obj, pushFun,jArray);
+其他数据类型为
+jobjectArray;
+jbooleanArray;
+jbyteArray;
+jcharArray;
+jshortArray;
+jintArray;
+jlongArray;
+jfloatArray;
+jdoubleArray;相关使用自行百度
+
+注：如果出现可以进入函数java函数但是无法调用的情况，可以在Java中新建一个函数来调用java方法，如下便是在此函数中，新建一个App,调用querydata()这个函数
+public void queryfunc(long oid) throws IOException, InterruptedException {
+		System.out.println("query function:");
+		App pushfunc = new App();		
+		try {
+			pushfunc.querydata(oid);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
